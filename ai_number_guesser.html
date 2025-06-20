@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Algorithm Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f4ff;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            border: 1px solid #ddd;
+        }
+
+        .header {
+            background: #1e40af;
+            color: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            min-height: 500px;
+        }
+
+        .agent-panel {
+            background: #ffffff;
+            padding: 25px 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .agent-panel:last-child {
+            border-right: none;
+            border-left: 1px solid #ddd;
+        }
+
+        .agent-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .robot-icon {
+            width: 40px;
+            height: 40px;
+            background: #3b82f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .agent-info {
+            flex-grow: 1;
+        }
+
+        .agent-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .agent-type {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .data-section {
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .target-number {
+            background: #2563eb;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .target-display {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            font-family: monospace;
+        }
+
+        .metrics-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8faff;
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .metric-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            font-family: monospace;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-ready { background: #60a5fa; }
+        .status-active { background: #1d4ed8; }
+        .status-waiting { background: #93c5fd; }
+        .status-complete { background: #1e40af; }
+
+        .analysis-panel {
+            background: white;
+            padding: 25px 30px;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+
+        .analysis-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .analysis-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .session-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #1e40af;
+        }
+
+        .session-info.active {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+        }
+
+        .log-container {
+            height: 600px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafbff;
+            color: white;
+        }
+
+        .log-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .log-entry {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            background: white;
+            position: relative;
+            font-size: 0.85rem;
+        }
+
+        .log-entry.bot1 {
+            border-left: 3px solid #3b82f6;
+            background: #307ef2;
+        }
+
+        .log-entry.bot2 {
+            border-left: 3px solid #1d4ed8;
+            background: #054cb5;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .log-agent {
+            font-weight: 600;
+            color: #ccc6c6;
+            font-size: 0.8rem;
+        }
+
+        .log-timestamp {
+            font-size: 0.7rem;
+            color: #edebeb;
+            font-family: monospace;
+        }
+
+        .log-guess {
+            font-family: monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color:#d9d4d4 ;
+            margin-bottom: 2px;
+        }
+
+        .log-response {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color:#edebeb
+        }
+
+        .controls-panel {
+            background: #f9f9f9;
+            padding: 20px 30px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .digits-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            width: 60px;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #3b82f6;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(20px);
+        }
+
+        .custom-numbers {
+            display: none;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 6px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .custom-numbers.active {
+            display: flex;
+        }
+
+        .number-input {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-family: monospace;
+            text-align: center;
+            width: 80px;
+        }
+
+        .control-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .control-button:hover {
+            background: #1d4ed8;
+        }
+
+        .control-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .algorithm-badge {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 1000px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .agent-panel {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .agent-panel:last-child {
+                border-left: none;
+            }
+            
+            .analysis-panel {
+                border-left: none;
+                border-right: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Number Guessing Algorithm Analysis</h1>
+            <p>Two of the same algorithms competing</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Agent 1 Panel -->
+            <div class="agent-panel">
+                <div class="agent-header">
+                    <div class="agent-title">Bot #1</div>
+                    <div class="agent-type">Algorithm Instance</div>
+                </div>
+
+                <div class="data-section">
+                    <div class="section-label">Target Number</div>
+                    <div class="target-number">
+                        <div class="target-display" id="agent1-target">847</div>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="section-label">Metrics</div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Attempts</span>
+                            <span class="metric-value" id="agent1-attempts">0</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Turn</span>
+                            <span class="metric-value" id="agent1-priority">Standby</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Panel -->
+            <div class="analysis-panel">
+                <div class="analysis-header">
+                    <div class="analysis-title">Execution Log</div>
+                </div>
+
+                <div class="session-info" id="session-status">
+                    <strong>Status:</strong> Ready to start analysis. Click "Start Analysis" to begin.
+                </div>
+
+                <div class="log-container" id="log-container">
+                    <div class="log-empty">
+                        Log entries will appear here during analysis
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent 2 Panel -->
+            <div class="agent-panel">
+                <div class="agent-header">
+                    <div class="agent-title">Bot #2</div>
+                    <div class="agent-type">Algorithm Instance</div>
+                </div>
+
+                <div class="data-section">
+                    <div class="section-label">Target Number</div>
+                    <div class="target-number">
+                        <div class="target-display" id="agent2-target">326</div>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="section-label">Metrics</div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Attempts</span>
+                            <span class="metric-value" id="agent2-attempts">0</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Turn</span>
+                            <span class="metric-value" id="agent2-priority">Standby</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <div class="control-group">
+                <label class="control-label" for="digits-input">Digits:</label>
+                <input type="number" id="digits-input" class="digits-input" value="3" min="2" max="9" onchange="updateTargetNumbers()">
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">Choose Numbers:</label>
+                <div class="toggle-container">
+                    <div class="toggle-switch" id="custom-toggle" onclick="toggleCustomNumbers()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="control-button" id="start-btn" onclick="startAnalysis()">
+                Start Analysis
+            </button>
+            
+            <div class="custom-numbers" id="custom-numbers">
+                <div class="control-group">
+                    <label class="control-label">Bot #1:</label>
+                    <input type="text" id="bot1-input" class="number-input" placeholder="123">
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Bot #2:</label>
+                    <input type="text" id="bot2-input" class="number-input" placeholder="456">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let analysisRunning = false;
+        let currentAgent = 1;
+        let attemptCount1 = 0;
+        let attemptCount2 = 0;
+        let digits = 3; // Number of digits
+        let bot1Possibilities = [];
+        let bot2Possibilities = [];
+        let bot1Target = '';
+        let bot2Target = '';
+        let gameInterval = null;
+        let customNumbersEnabled = false;
+        let currentRound = null;
+        let roundNumber = 1;
+
+        // Generate all possible numbers with no repeating digits and no zeros
+        function generateAllPossibilities() {
+            const possibilities = [];
+            const availableDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            
+            function generateCombinations(current, remaining, length) {
+                if (current.length === length) {
+                    possibilities.push(parseInt(current.join('')));
+                    return;
+                }
+                
+                for (let i = 0; i < remaining.length; i++) {
+                    const newCurrent = [...current, remaining[i]];
+                    const newRemaining = remaining.filter((_, index) => index !== i);
+                    generateCombinations(newCurrent, newRemaining, length);
+                }
+            }
+            
+            generateCombinations([], availableDigits, digits);
+            return possibilities;
+        }
+
+        function generateValidNumber() {
+            const availableDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            const result = [];
+            
+            for (let i = 0; i < digits; i++) {
+                const randomIndex = Math.floor(Math.random() * availableDigits.length);
+                result.push(availableDigits[randomIndex]);
+                availableDigits.splice(randomIndex, 1);
+            }
+            
+            return result.join('');
+        }
+
+        function detectResult(myGuess, theReal) {
+            let As = 0;
+            let Bs = 0;
+            const guess = String(myGuess);
+            const real = String(theReal);
+            
+            for (let i = 0; i < guess.length; i++) {
+                if (real.includes(guess[i])) {
+                    if (guess[i] === real[i]) {
+                        As++;
+                    } else {
+                        Bs++;
+                    }
+                }
+            }
+            
+            return 'B'.repeat(Bs) + 'A'.repeat(As);
+        }
+
+        function eliminate(guess, answer, possibilities) {
+            const newPossibilities = [];
+            const numOfB = (answer.match(/B/g) || []).length;
+            const numOfA = (answer.match(/A/g) || []).length;
+            
+            if (answer === 'A'.repeat(digits)) {
+                return 'win';
+            }
+            
+            for (let i = 0; i < possibilities.length; i++) {
+                let numsCount = 0;
+                let equalCount = 0;
+                const nums = String(guess).split('').map(Number);
+                const possibility = String(possibilities[i]);
+                
+                for (let j = 0; j < nums.length; j++) {
+                    if (possibility.includes(String(nums[j])) && possibility[j] !== String(nums[j])) {
+                        numsCount++;
+                    }
+                    if (possibility[j] === String(nums[j])) {
+                        equalCount++;
+                    }
+                }
+                
+                if (numsCount === numOfB && equalCount === numOfA) {
+                    newPossibilities.push(possibilities[i]);
+                }
+            }
+            
+            return newPossibilities;
+        }
+
+        function makeBotGuess(botNumber) {
+            let possibilities, target, otherBot;
+            
+            if (botNumber === 1) {
+                possibilities = bot1Possibilities;
+                target = bot2Target;
+                otherBot = 'Bot #2';
+            } else {
+                possibilities = bot2Possibilities;
+                target = bot1Target;
+                otherBot = 'Bot #1';
+            }
+            
+            if (possibilities === 'win' || possibilities.length === 0) {
+                return null;
+            }
+            
+            const guess = possibilities[0];
+            const result = detectResult(guess, target);
+            
+            // Add the guess to the current round
+            addGuessToRound(botNumber, guess, result);
+            
+            // Update possibilities
+            const newPossibilities = eliminate(guess, result, possibilities);
+            
+            if (botNumber === 1) {
+                bot1Possibilities = newPossibilities;
+                attemptCount1++;
+            } else {
+                bot2Possibilities = newPossibilities;
+                attemptCount2++;
+            }
+            
+            updateMetrics();
+            
+            // Check for win
+            if (newPossibilities === 'win') {
+                endGame(`Bot #${botNumber} wins!`);
+                return 'win';
+            }
+            
+            return result;
+        }
+
+        function addGuessToRound(botNumber, guess, result) {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+            
+            // Create new round if needed
+            if (!currentRound || (botNumber === 1 && currentRound.querySelector('.bot1'))) {
+                currentRound = document.createElement('div');
+                currentRound.className = 'log-round';
+                logContainer.appendChild(currentRound);
+                
+                if (botNumber === 2) {
+                    roundNumber++;
+                }
+            }
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry bot${botNumber}`;
+            entry.innerHTML = `
+                <div class="log-header">
+                    <span class="log-agent">Bot #${botNumber}</span>
+                    <span class="log-timestamp">${timestamp}</span>
+                </div>
+                <div class="log-guess">Guess: ${guess}</div>
+                <div class="log-response">Result: ${result}</div>
+            `;
+            
+            currentRound.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function gameLoop() {
+            if (!analysisRunning) return;
+            
+            // Both bots make their guesses in the same round
+            if (currentAgent === 1) {
+                document.getElementById('agent1-priority').textContent = 'Current';
+                document.getElementById('agent2-priority').textContent = 'Current';
+                
+                const result1 = makeBotGuess(1);
+                if (result1 === 'win') return;
+                
+                // Small delay before bot 2's guess
+                setTimeout(() => {
+                    const result2 = makeBotGuess(2);
+                    if (result2 === 'win') return;
+                    
+                    // Continue to next round after both bots have guessed
+                    setTimeout(gameLoop, 1000);
+                }, 500);
+            }
+        }
+
+        function endGame(winner) {
+            analysisRunning = false;
+            clearInterval(gameInterval);
+            
+            document.getElementById('session-status').innerHTML = `<strong>Game Complete:</strong> ${winner} Target numbers: Bot #1: ${bot1Target}, Bot #2: ${bot2Target}`;
+            document.getElementById('session-status').className = 'session-info active';
+            
+            document.getElementById('start-btn').textContent = 'Start New Analysis';
+            document.getElementById('start-btn').disabled = false;
+            
+            document.getElementById('agent1-priority').textContent = 'Complete';
+            document.getElementById('agent2-priority').textContent = 'Complete';
+        }
+
+        function resetAnalysis() {
+            // Get target numbers (custom or random)
+            const targets = getTargetNumbers();
+            if (!targets) return false; // Validation failed
+            
+            bot1Target = targets.bot1;
+            bot2Target = targets.bot2;
+            
+            document.getElementById('agent1-target').textContent = bot1Target;
+            document.getElementById('agent2-target').textContent = bot2Target;
+            
+            // Initialize possibilities for both bots
+            const allPossibilities = generateAllPossibilities();
+            bot1Possibilities = [...allPossibilities];
+            bot2Possibilities = [...allPossibilities];
+            
+            attemptCount1 = 0;
+            attemptCount2 = 0;
+            
+            updateMetrics();
+            
+            document.getElementById('agent1-priority').textContent = 'Standby';
+            document.getElementById('agent2-priority').textContent = 'Standby';
+            
+            document.getElementById('log-container').innerHTML = '<div class="log-empty">Log entries will appear here during analysis</div>';
+            
+            currentAgent = 1;
+            currentRound = null;
+            roundNumber = 1;
+            return true;
+        }
+
+        function updateMetrics() {
+            document.getElementById('agent1-attempts').textContent = attemptCount1;
+            document.getElementById('agent2-attempts').textContent = attemptCount2;
+        }
+
+        function updateTargetNumbers() {
+            if (analysisRunning) return; // Don't update during game
+            
+            const digitsInput = document.getElementById('digits-input');
+            const newDigits = parseInt(digitsInput.value);
+            
+            // Validate digits
+            if (newDigits < 2 || newDigits > 9) {
+                return;
+            }
+            
+            digits = newDigits;
+            
+            // Generate new target numbers only if not using custom numbers
+            if (!customNumbersEnabled) {
+                bot1Target = generateValidNumber();
+                bot2Target = generateValidNumber();
+                
+                document.getElementById('agent1-target').textContent = bot1Target;
+                document.getElementById('agent2-target').textContent = bot2Target;
+            }
+            
+            // Update placeholders for custom inputs
+            const placeholder = '1'.repeat(digits).split('').map((_, i) => i + 1).join('');
+            document.getElementById('bot1-input').placeholder = placeholder.substring(0, digits);
+            document.getElementById('bot2-input').placeholder = (parseInt(placeholder.substring(0, digits)) + 111).toString().substring(0, digits);
+        }
+
+        function toggleCustomNumbers() {
+            customNumbersEnabled = !customNumbersEnabled;
+            const toggle = document.getElementById('custom-toggle');
+            const customPanel = document.getElementById('custom-numbers');
+            
+            if (customNumbersEnabled) {
+                toggle.classList.add('active');
+                customPanel.classList.add('active');
+            } else {
+                toggle.classList.remove('active');
+                customPanel.classList.remove('active');
+                // Revert to random numbers
+                //updateTargetNumbers();
+            }
+        }
+
+        function validateCustomNumber(number) {
+            const str = number.toString();
+            
+            // Check length
+            if (str.length !== digits) {
+                return false;
+            }
+            
+            // Check for zeros
+            if (str.includes('0')) {
+                return false;
+            }
+            
+            // Check for repeating digits
+            const uniqueDigits = new Set(str.split(''));
+            if (uniqueDigits.size !== str.length) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        function getTargetNumbers() {
+            if (customNumbersEnabled) {
+                const bot1Input = document.getElementById('bot1-input').value;
+                const bot2Input = document.getElementById('bot2-input').value;
+                
+                if (!bot1Input || !bot2Input) {
+                    alert('Please enter numbers for both bots');
+                    return null;
+                }
+                
+                const bot1Num = parseInt(bot1Input);
+                const bot2Num = parseInt(bot2Input);
+                
+                if (!validateCustomNumber(bot1Num)) {
+                    alert(`Bot #1 number must be ${digits} digits with no zeros or repeating digits`);
+                    return null;
+                }
+                
+                if (!validateCustomNumber(bot2Num)) {
+                    alert(`Bot #2 number must be ${digits} digits with no zeros or repeating digits`);
+                    return null;
+                }
+                
+                return { bot1: bot1Num.toString(), bot2: bot2Num.toString() };
+            } else {
+                return { bot1: document.getElementById('agent1-target').innerText, bot2: document.getElementById('agent2-target').innerText };
+            }
+        }
+
+        function startAnalysis() {
+            if (analysisRunning) {
+                // Reset for new game
+                analysisRunning = false;
+                clearInterval(gameInterval);
+            }
+            
+            // Get digits from input
+            const digitsInput = document.getElementById('digits-input');
+            digits = parseInt(digitsInput.value);
+            
+            // Validate digits
+            if (digits < 2 || digits > 9) {
+                alert('Please enter a number between 2 and 9 digits');
+                return;
+            }
+            
+            analysisRunning = true;
+            
+            document.getElementById('start-btn').textContent = 'Analysis Running';
+            document.getElementById('start-btn').disabled = true;
+            
+            if (!resetAnalysis()) {
+                // Reset failed due to validation
+                document.getElementById('start-btn').textContent = 'Start Analysis';
+                document.getElementById('start-btn').disabled = false;
+                return;
+            }
+            
+            document.getElementById('session-status').innerHTML = `<strong>Status:</strong> ${digits}-digit number guessing competition in progress!`;
+            document.getElementById('session-status').className = 'session-info active';
+            
+            document.getElementById('log-container').innerHTML = '';
+            
+            // Start the game loop
+            setTimeout(gameLoop, 1000);
+        } function addLogEntry(agent, action, response) {
+            // This function is now replaced by addGuessToRound but kept for compatibility
+        }
+
+        window.addEventListener('load', function() {
+            resetAnalysis();
+        });
+    </script>
+</body>
+</html>
