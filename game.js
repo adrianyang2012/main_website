@@ -459,7 +459,7 @@ class Enemy {
         this.vx = 0;
         this.vy = 0;
         this.color = color;
-        this.maxHealth = 125;
+        this.maxHealth = 100;
         this.health = this.maxHealth;
         this.speed = 1000; // Increased from 450
         this.friction = 0.85; // Reduced from 0.85 for less glidy movement
