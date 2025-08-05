@@ -1,0 +1,66 @@
+# Star Wars Lightsaber Duel Game
+
+A thrilling 2D lightsaber combat game featuring Jedi vs Sith combat with Force abilities!
+
+## How to Play
+
+### Controls
+- **Arrow Keys** or **WASD**: Move your character
+- **Mouse**: Aim your lightsaber
+- **Space Bar**: Force Push (10 second cooldown)
+- **Mouse Click**: Force Dash (8 second cooldown)
+
+### Game Features
+
+#### Player Abilities
+- **Lightsaber**: Always active, follows mouse cursor, deals 5-10 damage
+- **Force Push**: Pushes enemy backward when they're within range (10 second cooldown)
+- **Force Dash**: Rapid dash in the direction you're facing (8 second cooldown)
+
+#### Enemy AI
+The enemy features a complex AI system that:
+- **Strategically dodges** your attacks using advanced pathfinding
+- **Uses lightsabers** to counter-attack when in range
+- **Force pushes** when you get too close and are dealing significant damage
+- **Adapts aggression** based on health differences
+- **Patrols** when you're out of range
+- **Engages** in tactical combat when you're nearby
+
+#### Game Mechanics
+- **Health System**: Both player and enemy have 250 health
+- **Collision Detection**: Precise lightsaber hit detection
+- **Particle Effects**: Visual feedback for damage and Force abilities
+- **Cooldown System**: Balanced ability usage with visual indicators
+- **Dynamic AI**: Enemy behavior changes based on combat situation
+
+### Visual Features
+- **Star Wars themed** color scheme with gold accents
+- **Animated lightsabers** with glow effects
+- **Particle systems** for damage and Force effects
+- **Health bars** with real-time updates
+- **Cooldown indicators** for abilities
+- **Starfield background** for atmosphere
+
+### Technical Details
+- Built with HTML5 Canvas and JavaScript
+- Smooth 60 FPS gameplay
+- Responsive controls
+- Advanced AI state machine
+- Optimized collision detection
+
+## Getting Started
+
+1. Open `index.html` in a modern web browser
+2. The game will start automatically
+3. Use the controls to engage in lightsaber combat with the AI enemy
+4. Try to defeat the enemy while avoiding their attacks!
+
+## Game Balance
+
+The game is designed to be challenging but fair:
+- Enemy AI is intelligent but not unbeatable
+- Force abilities have meaningful cooldowns
+- Health and damage values are balanced for engaging combat
+- Movement speed allows for tactical positioning
+
+May the Force be with you! 
