@@ -697,13 +697,13 @@ class Enemy {
         
         switch (this.currentStance) {
             case 'aggressive':
-                targetDistance = 60 + Math.random() * 120;
+                targetDistance = 45 + Math.random() * 80;
                 break;
             case 'defensive':
-                targetDistance = 120 + Math.random() * 120;
+                targetDistance = 150 + Math.random() * 30;
                 break;
             case 'balanced':
-                targetDistance = 80 + Math.random() * 120;
+                targetDistance = 75 + Math.random() * 60;
                 break;
         }
         
