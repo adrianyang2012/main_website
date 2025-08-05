@@ -100,7 +100,7 @@ class Game {
                 this.player.lightsaber.tip.y - this.enemy.y
             );
             
-            if (Math.abs(distance) < 32 && this.enemy.canTakeDamage()) {
+            if (Math.abs(distance) < 30 && this.enemy.canTakeDamage()) {
                 const damage = Math.random() * 5 + 5; // 5-10 damage
                 this.enemy.takeDamage(damage);
                 this.createDamageParticles(this.enemy.x, this.enemy.y, '#ff0066');
